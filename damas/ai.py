@@ -1,12 +1,11 @@
 import random
-from typing import List
 
-from damas.game import Move, Player, Board
+from damas.game import Player, Board
 
 
 class RandomPlayer(Player):
 
-    def choose_move(self, moves: List[Move]) -> Move:
+    def choose_move(self, moves):
         i = random.randrange(len(moves))
         return moves[i]
 
@@ -18,10 +17,11 @@ class HumanPlayer(Player):
         super().__init__(board)
         self._window = window
 
-    def choose_move(self, moves: List[Move]) -> Move:
+    def choose_move(self, moves):
         self._window.clear()
         for i, move in enumerate(moves):
-            self._window.addstr(i, 0, f"{self.key_to_pos[i].upper()}: {repr(move)}")
+            pos_a, pos_b = move
+            self._window.addstr(i, 0, f"{self.key_to_pos[i].upper()}: {pos_a}->{pos_b}")
 
         self._window.refresh()
 

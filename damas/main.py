@@ -1,6 +1,6 @@
 import curses
 
-from damas.game import Position, Piece, Colour, Game, Board, Display
+from damas.game import Game, Board, Display
 from damas.ai import RandomPlayer, HumanPlayer
 from damas.settings import NUM_COLS, NUM_ROWS
 
@@ -17,6 +17,8 @@ class CursesDisplay(Display):
         y += NUM_ROWS + 2 + 1
         self.moves_window = curses.newwin(20, self.MAX_WIDTH, y, 0)
 
+    value_to_char = {0: " ", +1: "w", +2: "W", -1: "b", -2: "B"}
+
     def render_board(self, board: Board):
         for row in range(NUM_ROWS - 1, -1, -1):
             y = NUM_ROWS - 1 - row
@@ -24,14 +26,9 @@ class CursesDisplay(Display):
 
             self.board_window.addstr(y, x, f"{row} |")
             for col in range(NUM_COLS):
-                cell = board.piece_at(Position(row, col))
-                if cell is None:
-                    self.board_window.addstr(" |")
-                elif isinstance(cell, Piece):
-                    char = "w" if cell.colour == Colour.WHITE else "b"
-                    if cell.is_king:
-                        char = char.upper()
-                    self.board_window.addstr(f"{char}|")
+                value = board[(row, col)]
+                char = self.value_to_char[value]
+                self.board_window.addstr(f"{char}|")
 
         y = NUM_ROWS
         x = 0
@@ -51,34 +48,11 @@ class CursesDisplay(Display):
             self.status_window.refresh()
 
 
-def print_board(board, window):
-    for row in range(NUM_ROWS - 1, -1, -1):
-        y = NUM_ROWS - 1 - row
-        x = 0
-
-        window.addstr(y, x, f"{row} |")
-        for col in range(NUM_COLS):
-            cell = board.piece_at(Position(row, col))
-            if cell is None:
-                window.addstr(" |")
-            elif isinstance(cell, Piece):
-                char = "w" if cell.colour == Colour.WHITE else "b"
-                if cell.is_king:
-                    char = char.upper()
-                window.addstr(f"{char}|")
-
-    y = NUM_ROWS
-    x = 0
-    window.addstr(y, x, "   ")
-    for col in range(NUM_COLS):
-        window.addstr(f"{col} ")
-
-    window.refresh()
-
-
 def main(_):
     board = Board()
     board.start()
+    # board.add((7, 0), +2)
+    # board.add((6, 1), -1)
 
     display = CursesDisplay()
     player1 = HumanPlayer(board, display.moves_window)
