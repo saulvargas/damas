@@ -1,8 +1,18 @@
 import curses
+import sys
 
-from damas.ai import HumanPlayer, MinimaxPlayer
+from damas.ai import HumanPlayer, MinimaxPlayer, RandomPlayer
 from damas.game import Game, Board, Display
 from damas.settings import NUM_COLS, NUM_ROWS
+
+
+class NoDisplay(Display):
+
+    def render_board(self, board: Board):
+        pass
+
+    def notify(self, msg: str, confirm: bool):
+        pass
 
 
 class CursesDisplay(Display):
@@ -48,13 +58,17 @@ class CursesDisplay(Display):
             self.status_window.refresh()
 
 
-def main(_):
+def main(gui: bool = True):
     board = Board()
     board.start()
 
-    display = CursesDisplay()
-    player1 = HumanPlayer(board, +1, display.moves_window)
-    # player1 = RandomPlayer(board, +1)
+    if gui:
+        display = CursesDisplay()
+    else:
+        display = NoDisplay()
+
+    # player1 = HumanPlayer(board, +1, display.moves_window)
+    player1 = RandomPlayer(board, +1)
     # player1 = MinimaxPlayer(board, +1, depth=4)
     player2 = MinimaxPlayer(board, -1, depth=4)
 
@@ -63,4 +77,7 @@ def main(_):
 
 
 if __name__ == '__main__':
-    curses.wrapper(main)
+    if (len(sys.argv) == 2) and (sys.argv[1] == "--no-gui"):
+        main(gui=False)
+    else:
+        curses.wrapper(main)

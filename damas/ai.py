@@ -7,8 +7,13 @@ from damas.game import Player, Board
 
 class RandomPlayer(Player):
 
+    def __init__(self, board: Board, player: int):
+        super().__init__(board, player)
+
+        self._rs = random.Random(1)
+
     def choose_move(self, moves):
-        i = random.randrange(len(moves))
+        i = self._rs.randrange(len(moves))
         return moves[i]
 
 
@@ -17,6 +22,7 @@ class MinimaxPlayer(Player):
     def __init__(self, board: Board, player: int, depth: int):
         super().__init__(board, player)
         self._depth = depth
+        self._rs = random.Random(1)
 
     def _score(self, board: Board):
         # TODO: replace really bad heuristic!
@@ -54,7 +60,7 @@ class MinimaxPlayer(Player):
     def choose_move(self, moves):
         best_score, best_moves = self._minimax(self._board, self._depth, self._player)
 
-        i = random.randrange(len(best_moves))
+        i = self._rs.randrange(len(best_moves))
         return best_moves[i]
 
 
