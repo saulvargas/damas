@@ -9,17 +9,19 @@ from damas.settings import NUM_PIECES, NUM_ROWS, NUM_COLS
 class Board:
 
     def __init__(self):
-        self._cells = np.zeros((NUM_ROWS, NUM_COLS), dtype=np.int8)
+        self.values = np.zeros((NUM_ROWS, NUM_COLS), dtype=np.int8)
 
     def __getitem__(self, pos: Tuple[int, int]) -> int:
-        return self._cells[pos]
+        return self.values[pos]
 
     def __setitem__(self, pos: Tuple[int, int], value: int):
-        self._cells[pos] = value
+        self.values[pos] = value
 
-    def copy(self):
+    def copy(self) -> "Board":
         board = Board()
-        board._cells = self._cells.copy()
+        board.values = self.values.copy()
+
+        return board
 
     def add(self, pos: Tuple[int, int], value: int):
         self[pos] = value
@@ -80,7 +82,7 @@ class Board:
         jumps = []
         simples = []
 
-        for xy in np.transpose(np.nonzero(self._cells * player > 0)):
+        for xy in np.transpose(np.nonzero(self.values * player > 0)):
             pos_a = tuple(xy)
             pos_jumps, pos_simples = self._get_moves_from(pos_a)
             jumps += pos_jumps
@@ -117,8 +119,9 @@ class Board:
 
 class Player(ABC):
 
-    def __init__(self, board: Board):
+    def __init__(self, board: Board, player: int):
         self._board = board
+        self._player = player
 
     @abstractmethod
     def choose_move(self, moves):

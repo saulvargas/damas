@@ -1,7 +1,7 @@
 import curses
 
+from damas.ai import HumanPlayer, MinimaxPlayer
 from damas.game import Game, Board, Display
-from damas.ai import RandomPlayer, HumanPlayer
 from damas.settings import NUM_COLS, NUM_ROWS
 
 
@@ -51,13 +51,12 @@ class CursesDisplay(Display):
 def main(_):
     board = Board()
     board.start()
-    # board.add((7, 0), +2)
-    # board.add((6, 1), -1)
 
     display = CursesDisplay()
-    player1 = HumanPlayer(board, display.moves_window)
-    # player1 = RandomPlayer(board)
-    player2 = RandomPlayer(board)
+    player1 = HumanPlayer(board, +1, display.moves_window)
+    # player1 = RandomPlayer(board, +1)
+    # player1 = MinimaxPlayer(board, +1, depth=4)
+    player2 = MinimaxPlayer(board, -1, depth=4)
 
     game = Game(board, display, player1, player2)
     game.loop()
