@@ -21,7 +21,7 @@ class Game:
             if player == +1:
                 turns += 1
 
-            self.display.event_new_turn(player)
+            self.display.new_turn(player)
 
             move = self.players[player].choose_move(possible_moves)
 
@@ -37,9 +37,9 @@ class Game:
             possible_moves = self.board.get_all_moves(-player)
 
             if possible_moves:
-                self.display.event_end_turn(player)
+                self.display.end_turn(player)
                 player = -player
             else:
-                self.display.event_end_game(player)
+                self.display.end_game(player)
 
                 return player, turns

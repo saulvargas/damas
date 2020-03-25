@@ -11,15 +11,19 @@ class Display(ABC):
         pass
 
     @abstractmethod
-    def event_new_turn(self, player):
+    def new_turn(self, player):
         pass
 
     @abstractmethod
-    def event_end_turn(self, player):
+    def end_turn(self, player):
         pass
 
     @abstractmethod
-    def event_end_game(self, winner):
+    def end_game(self, winner):
+        pass
+
+    @abstractmethod
+    def select_move(self, moves):
         pass
 
 
@@ -28,13 +32,16 @@ class NoDisplay(Display):
     def render_board(self, board: Board):
         pass
 
-    def event_new_turn(self, player):
+    def new_turn(self, player):
         pass
 
-    def event_end_turn(self, player):
+    def end_turn(self, player):
         pass
 
-    def event_end_game(self, winner):
+    def end_game(self, winner):
+        pass
+
+    def select_move(self, moves):
         pass
 
 
@@ -84,17 +91,42 @@ class CursesDisplay(Display):
         else:
             return "BLACKS"
 
-    def event_new_turn(self, player):
+    def new_turn(self, player):
         self.status_window.clear()
         self.status_window.addstr(0, 0, f"TURN FOR {self._player_name(player)}")
         self.status_window.refresh()
 
-    def event_end_turn(self, player):
+    def end_turn(self, player):
         self.status_window.clear()
         self.status_window.addstr(0, 0, f"END OF {self._player_name(player)} TURN - PRESS ANY KEY TO CONTINUE")
         self.status_window.getkey()
 
-    def event_end_game(self, winner):
+    def end_game(self, winner):
         self.status_window.clear()
         self.status_window.addstr(0, 0, f"{self._player_name(winner)} WIN - PRESS ANY KEY TO EXIT")
         self.status_window.getkey()
+
+    key_to_pos = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                  "q", "w", "e", "r", "t", "y", "u", "i", "o", "p"
+                  "a", "s", "d", "f", "g", "h", "j", "k", "l"]
+
+    def select_move(self, moves):
+        self.moves_window.clear()
+        for i, move in enumerate(moves):
+            pos_a, pos_b = move
+            self.moves_window.addstr(i, 0, f"{self.key_to_pos[i].upper()}: {pos_a}->{pos_b}")
+
+        while True:
+            key = self.moves_window.getkey().lower()
+            try:
+                pos = self.key_to_pos.index(key)
+                if pos < len(moves):
+                    break
+            except ValueError:
+                pass
+
+        self.moves_window.clear()
+        self.moves_window.refresh()
+
+        return moves[pos]
+

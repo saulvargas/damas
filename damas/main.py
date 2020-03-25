@@ -12,7 +12,7 @@ def main(_):
 
     display = CursesDisplay()
 
-    player1 = HumanPlayer(board, +1, display.moves_window)
+    player1 = HumanPlayer(board, +1, display)
     # player1 = RandomPlayer(board, +1, seed=1)
     # player1 = MinimaxPlayer(board, +1, depth=4, seed=1)
     player2 = MinimaxPlayer(board, -1, depth=4, seed=1)
