@@ -142,41 +142,37 @@ class Game:
     def __init__(self, board: Board, display: Display, player_w: Player, player_b: Player):
         self.board = board
         self.display = display
-        self.player1 = player_w
-        self.player2 = player_b
-        self.turn = +1
-
-    def _next_turn(self):
-        self.turn *= -1
-
-    def _ask_move(self, moves):
-        player = self.player1 if self.turn == +1 else self.player2
-        return player.choose_move(moves)
+        self.players = {+1: player_w, -1: player_b}
 
     def loop(self):
         self.display.render_board(self.board)
 
-        possible_moves = self.board.get_all_moves(self.turn)
-        while possible_moves:
-            self.display.notify(f"TURN FOR {player_name(self.turn)}", confirm=False)
+        player = +1
+        turns = 0
 
-            move = self._ask_move(possible_moves)
+        possible_moves = self.board.get_all_moves(player)
+        while True:
+            if player == +1:
+                turns += 1
 
-            more_moves = self.board.move(self.turn, move)
+            self.display.notify(f"TURN FOR {player_name(player)}", confirm=False)
+
+            move = self.players[player].choose_move(possible_moves)
+
+            more_moves = self.board.move(player, move)
             self.display.render_board(self.board)
 
             while more_moves:
-                move = self._ask_move(more_moves)
-                more_moves = self.board.move(self.turn, move)
+                move = self.players[player].choose_move(more_moves)
+                more_moves = self.board.move(player, move)
 
                 self.display.render_board(self.board)
 
-            this_turn = player_name(self.turn)
-
-            self._next_turn()
-            possible_moves = self.board.get_all_moves(self.turn)
+            possible_moves = self.board.get_all_moves(-player)
 
             if possible_moves:
-                self.display.notify(f"END OF {this_turn} TURN - PRESS ANY KEY TO CONTINUE", confirm=True)
+                self.display.notify(f"END OF {player_name(player)} TURN - PRESS ANY KEY TO CONTINUE", confirm=True)
+                player = -player
             else:
-                self.display.notify(f"{this_turn} WIN - PRESS ANY KEY TO EXIT", confirm=True)
+                self.display.notify(f"{player_name(player)} WIN - PRESS ANY KEY TO EXIT", confirm=True)
+                return player, turns
