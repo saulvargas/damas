@@ -1,8 +1,20 @@
 import random
+from abc import ABC, abstractmethod
 
 import numpy as np
 
-from damas.game import Player, Board
+from damas.board import Board
+
+
+class Player(ABC):
+
+    def __init__(self, board: Board, player: int):
+        self._board = board
+        self._player = player
+
+    @abstractmethod
+    def choose_move(self, moves):
+        pass
 
 
 class RandomPlayer(Player):

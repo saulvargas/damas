@@ -1,8 +1,9 @@
 from time import time
 
-from damas.ai import RandomPlayer, MinimaxPlayer
-from damas.game import Game, Board
-from damas.main import NoDisplay
+from damas.player import MinimaxPlayer
+from damas.board import Board
+from damas.game import Game
+from damas.display import NoDisplay
 
 
 def main():
