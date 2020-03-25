@@ -3,13 +3,6 @@ from damas.display import Display
 from damas.player import Player
 
 
-def player_name(player):
-    if player == +1:
-        return "WHITES"
-    else:
-        return "BLACKS"
-
-
 class Game:
 
     def __init__(self, board: Board, display: Display, player_w: Player, player_b: Player):
@@ -28,7 +21,7 @@ class Game:
             if player == +1:
                 turns += 1
 
-            self.display.notify(f"TURN FOR {player_name(player)}", confirm=False)
+            self.display.event_new_turn(player)
 
             move = self.players[player].choose_move(possible_moves)
 
@@ -44,8 +37,9 @@ class Game:
             possible_moves = self.board.get_all_moves(-player)
 
             if possible_moves:
-                self.display.notify(f"END OF {player_name(player)} TURN - PRESS ANY KEY TO CONTINUE", confirm=True)
+                self.display.event_end_turn(player)
                 player = -player
             else:
-                self.display.notify(f"{player_name(player)} WIN - PRESS ANY KEY TO EXIT", confirm=True)
+                self.display.event_end_game(player)
+
                 return player, turns

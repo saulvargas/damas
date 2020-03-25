@@ -11,7 +11,15 @@ class Display(ABC):
         pass
 
     @abstractmethod
-    def notify(self, msg: str, confirm: bool):
+    def event_new_turn(self, player):
+        pass
+
+    @abstractmethod
+    def event_end_turn(self, player):
+        pass
+
+    @abstractmethod
+    def event_end_game(self, winner):
         pass
 
 
@@ -20,7 +28,13 @@ class NoDisplay(Display):
     def render_board(self, board: Board):
         pass
 
-    def notify(self, msg: str, confirm: bool):
+    def event_new_turn(self, player):
+        pass
+
+    def event_end_turn(self, player):
+        pass
+
+    def event_end_game(self, winner):
         pass
 
 
@@ -63,11 +77,24 @@ class CursesDisplay(Display):
 
         self.board_window.refresh()
 
-    def notify(self, msg: str, confirm: bool):
-        self.status_window.clear()
-        self.status_window.addstr(0, 0, msg)
-
-        if confirm:
-            self.status_window.getkey()
+    @staticmethod
+    def _player_name(player):
+        if player == +1:
+            return "WHITES"
         else:
-            self.status_window.refresh()
+            return "BLACKS"
+
+    def event_new_turn(self, player):
+        self.status_window.clear()
+        self.status_window.addstr(0, 0, f"TURN FOR {self._player_name(player)}")
+        self.status_window.refresh()
+
+    def event_end_turn(self, player):
+        self.status_window.clear()
+        self.status_window.addstr(0, 0, f"END OF {self._player_name(player)} TURN - PRESS ANY KEY TO CONTINUE")
+        self.status_window.getkey()
+
+    def event_end_game(self, winner):
+        self.status_window.clear()
+        self.status_window.addstr(0, 0, f"{self._player_name(winner)} WIN - PRESS ANY KEY TO EXIT")
+        self.status_window.getkey()
