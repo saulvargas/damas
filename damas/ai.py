@@ -29,9 +29,7 @@ class MinimaxPlayer(Player):
         balance = np.sum(board.values)
         return balance * self._player
 
-    def _minimax(self, board: Board, depth: int, player: int):
-        moves = board.get_all_moves(player)
-
+    def _minimax(self, board: Board, moves, depth: int, player: int):
         if player == self._player:
             best_score, best_moves = -1000, []
         else:
@@ -42,8 +40,12 @@ class MinimaxPlayer(Player):
 
         for move in moves:
             next_board = board.copy()
-            next_board.move(player, move)
-            score, _ = self._minimax(next_board, depth - 1, -player)
+            next_moves = next_board.move(player, move)
+            if next_moves:
+                score, _ = self._minimax(next_board, next_moves, depth - 1, player)
+            else:
+                next_moves = next_board.get_all_moves(-player)
+                score, _ = self._minimax(next_board, next_moves, depth - 1, -player)
 
             if score == best_score:
                 best_moves.append(move)
@@ -58,7 +60,7 @@ class MinimaxPlayer(Player):
         return best_score, best_moves
 
     def choose_move(self, moves):
-        best_score, best_moves = self._minimax(self._board, self._depth, self._player)
+        best_score, best_moves = self._minimax(self._board, moves, self._depth, self._player)
 
         i = self._rs.randrange(len(best_moves))
         return best_moves[i]
