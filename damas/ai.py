@@ -7,10 +7,10 @@ from damas.game import Player, Board
 
 class RandomPlayer(Player):
 
-    def __init__(self, board: Board, player: int):
+    def __init__(self, board: Board, player: int, seed=None):
         super().__init__(board, player)
 
-        self._rs = random.Random(1)
+        self._rs = random.Random(seed)
 
     def choose_move(self, moves):
         i = self._rs.randrange(len(moves))
@@ -19,10 +19,10 @@ class RandomPlayer(Player):
 
 class MinimaxPlayer(Player):
 
-    def __init__(self, board: Board, player: int, depth: int):
+    def __init__(self, board: Board, player: int, depth: int, seed=None):
         super().__init__(board, player)
         self._depth = depth
-        self._rs = random.Random(1)
+        self._rs = random.Random(seed)
 
     def _score(self, board: Board):
         # TODO: replace really bad heuristic!
