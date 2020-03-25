@@ -41,45 +41,51 @@ class MinimaxPlayer(Player):
         balance = np.sum(board.values)
         return balance * self._player
 
-    def _minimax(self, board: Board, moves, depth: int, player: int):
+    def _minimax(self, board: Board, moves, depth: int, alpha, beta, player: int):
         if player == self._player:
-            best_score, best_moves = -1000, []
+            best_score, best_move = -1000, None
         else:
-            best_score, best_moves = +1000, []
+            best_score, best_move = +1000, None
 
         if (depth == 0) or (not moves):
             return self._score(board), None
 
+        self._rs.shuffle(moves)
         for move in moves:
             next_board = board.copy()
             next_moves = next_board.move(player, move)
             if next_moves:
-                score, _ = self._minimax(next_board, next_moves, depth - 1, player)
+                score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta, player)
             else:
                 next_moves = next_board.get_all_moves(-player)
-                score, _ = self._minimax(next_board, next_moves, depth - 1, -player)
+                score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta, -player)
 
-            if score == best_score:
-                best_moves.append(move)
+            if player == self._player:
+                if score > best_score:
+                    best_score, best_move = score, move
+                alpha = max(alpha, best_score)
+                if alpha >= beta:
+                    break
             else:
-                if player == self._player:
-                    if score > best_score:
-                        best_score, best_moves = score, [move]
-                else:
-                    if score < best_score:
-                        best_score, best_moves = score, [move]
+                if score < best_score:
+                    best_score, best_move = score, move
+                beta = min(beta, best_score)
+                if alpha >= beta:
+                    break
 
-        return best_score, best_moves
+        return best_score, best_move
 
     def choose_move(self, moves):
-        best_score, best_moves = self._minimax(self._board, moves, self._depth, self._player)
+        alpha = -np.inf
+        beta = np.inf
+        best_score, best_move = self._minimax(self._board, moves, self._depth, alpha, beta, self._player)
 
-        i = self._rs.randrange(len(best_moves))
-        return best_moves[i]
+        return best_move
 
 
 class HumanPlayer(Player):
-    key_to_pos = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p"]
+    key_to_pos = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                  "q", "w", "e", "r", "t", "y", "u", "i", "o", "p"]
 
     def __init__(self, board: Board, player: int, window):
         super().__init__(board, player)
