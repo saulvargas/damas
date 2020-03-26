@@ -38,7 +38,7 @@ class NoDisplay(Display):
         pass
 
     def end_game(self, winner):
-        return True
+        pass
 
     def select_move(self, moves):
         pass

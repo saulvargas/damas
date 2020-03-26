@@ -11,39 +11,28 @@ class Game:
         self.players = {+1: player_w, -1: player_b}
 
     def loop(self):
+        board = self.board.copy()
+        self.display.render_board(board)
+
+        player, opponent = -1, +1
+        turns = 0
+        moves = None
+
         while True:
-            board = self.board.copy()
+            if not moves:
+                player, opponent = opponent, player
+                moves = board.get_all_moves(player)
 
-            self.display.render_board(board)
+                if moves and (turns > 0):
+                    self.display.end_turn(opponent)
+                elif not moves:
+                    self.display.end_game(winner=opponent)
+                    return opponent, turns
 
-            player = +1
-            turns = 0
-
-            possible_moves = board.get_all_moves(player)
-            while True:
+                self.display.new_turn(player)
                 if player == +1:
                     turns += 1
 
-                self.display.new_turn(player)
-
-                move = self.players[player].choose_move(possible_moves)
-
-                more_moves = board.move(player, move)
-                self.display.render_board(board)
-
-                while more_moves:
-                    move = self.players[player].choose_move(more_moves)
-                    more_moves = board.move(player, move)
-
-                    self.display.render_board(board)
-
-                possible_moves = board.get_all_moves(-player)
-
-                if possible_moves:
-                    self.display.end_turn(player)
-                    player = -player
-                else:
-                    if self.display.end_game(player):
-                        return player, turns
-                    else:
-                        break
+            move = self.players[player].choose_move(moves)
+            moves = board.move(player, move)
+            self.display.render_board(board)
