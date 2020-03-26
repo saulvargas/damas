@@ -3,17 +3,30 @@ var canvas = document.getElementById("board");
 var NUM_ROWS = 8;
 var NUM_COLS = 8;
 var NUM_PIECES = 12;
-
-var CELL_HEIGHT = 80;
-var CELL_WIDTH = 80;
-var PIECE_RADIUS = 30;
 var CELL_WHITE = 'rgb(220, 220, 220)';
 var CELL_BLACK = 'rgb(100, 200, 100)';
-
 var PIECE_BLACK = 'rgb(0, 0, 0)';
 var CROSS_BLACK = 'rgb(255, 255, 255)';
 var PIECE_WHITE = 'rgb(255, 255, 255)';
 var CROSS_WHITE = 'rgb(0, 0, 0)';
+var COLOR_SELECTED = 'rgba(100, 100, 100, 0.5)';
+
+let CELL_HEIGHT = Math.floor(canvas.height / NUM_ROWS);
+let CELL_WIDTH = Math.floor(canvas.width / NUM_COLS);
+let PIECE_RADIUS = 3 / 8 * CELL_HEIGHT;
+let CROWN_OUTER = 1 / 4 * CELL_HEIGHT;
+let CROWN_INNER = 1 / 20 * CELL_HEIGHT;
+
+var board = null;
+window.addEventListener('resize', function() {
+    CELL_HEIGHT = Math.floor(canvas.height / NUM_ROWS);
+    CELL_WIDTH = Math.floor(canvas.width / NUM_COLS);
+    PIECE_RADIUS = 3 / 8 * CELL_HEIGHT;
+    CROWN_OUTER = 1 / 4 * CELL_HEIGHT;
+    CROWN_INNER = 1 / 20 * CELL_HEIGHT;
+
+    draw(board);
+});
 
 function drawBoard(ctx) {
     for (let row = 0; row < NUM_ROWS; row++) {
@@ -53,15 +66,15 @@ function drawPiece(ctx, row, col, player) {
             ctx.fillStyle = CROSS_BLACK;
         }
 
-        ctx.fillRect(x - 10, y - 2, 20, 4);
-        ctx.fillRect(x - 2, y - 10, 4, 20);
+        ctx.fillRect(x - CROWN_OUTER / 2, y - CROWN_INNER / 2, CROWN_OUTER, CROWN_INNER);
+        ctx.fillRect(x - CROWN_INNER / 2, y - CROWN_OUTER / 2, CROWN_INNER, CROWN_OUTER);
     }
 }
 
 function draw(values) {
     var ctx = canvas.getContext('2d');
 
-    ctx.clearRect(0, 0, 640, 640);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBoard(ctx);
 
@@ -78,7 +91,6 @@ function draw(values) {
 
 webSocket = new WebSocket("ws://localhost:4444");
 
-var board = null;
 var moves = null;
 var posFrom = null;
 
@@ -96,7 +108,7 @@ canvas.onclick = function(e) {
 
     x = col * CELL_WIDTH;
     y = (NUM_ROWS - 1 - row) * CELL_HEIGHT;
-    ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
+    ctx.fillStyle = COLOR_SELECTED;
     ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
 
     console.log([row, col]);
