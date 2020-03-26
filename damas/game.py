@@ -1,3 +1,5 @@
+import asyncio
+
 from damas.board import Board
 from damas.display import Display
 from damas.player import Player
@@ -32,9 +34,6 @@ class Game:
                 if player == +1:
                     turns += 1
 
-            if (turns == 6) and (player == -1):
-                print("dale")
-
             move = self.players[player].choose_move(moves)
             moves = self.board.move(player, move)
             self.display.render_board(self.board)
@@ -62,5 +61,7 @@ class Game:
                     turns += 1
 
             move = self.players[player].choose_move(moves)
+            if asyncio.iscoroutine(move):
+                move = await move
             moves = self.board.move(player, move)
             await self.display.render_board(self.board)

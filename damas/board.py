@@ -62,7 +62,7 @@ class Board:
         poss_b = Board._moves_to(pos_a, value_a, length=1)
         values_b = self[(poss_b[:, 0], poss_b[:, 1])]
         valid = values_b == 0
-        moves1 = [(pos_a, tuple(xy)) for xy in poss_b[valid]]
+        moves1 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid]]
 
         return moves1
 
@@ -74,12 +74,12 @@ class Board:
         poss_c = (np.array(pos_a) + poss_b) // 2
         values_c = self[(poss_c[:, 0], poss_c[:, 1])]
         valid = (values_b == 0) & (value_a * values_c < 0)
-        moves2 = [(pos_a, tuple(xy)) for xy in poss_b[valid]]
+        moves2 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid]]
 
         return moves2
 
     def get_all_moves(self, player):
-        poss_a = [tuple(xy) for xy in np.transpose(np.nonzero(self.values * player > 0))]
+        poss_a = [tuple(xy.tolist()) for xy in np.transpose(np.nonzero(self.values * player > 0))]
 
         moves2 = [m for pos_a in poss_a for m in self._get_moves2_from(pos_a)]
         if moves2:
