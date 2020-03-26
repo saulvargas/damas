@@ -77,6 +77,9 @@ class MinimaxPlayer(Player):
         return best_score, best_move
 
     def choose_move(self, moves):
+        if len(moves) == 1:
+            return moves[0]
+
         alpha = -np.inf
         beta = np.inf
         best_score, best_move = self._minimax(self._board, moves, self._depth, alpha, beta, self._player)
