@@ -39,7 +39,7 @@ class NoDisplay(Display):
         pass
 
     def end_game(self, winner):
-        pass
+        return True
 
     def select_move(self, moves):
         pass
@@ -103,12 +103,18 @@ class CursesDisplay(Display):
 
     def end_game(self, winner):
         self.status_window.clear()
-        self.status_window.addstr(0, 0, f"{self._player_name(winner)} WIN - PRESS ANY KEY TO EXIT")
-        self.status_window.getkey()
+        self.status_window.addstr(0, 0, f"{self._player_name(winner)} WIN - (R)ESTART OR (Q)UIT?")
+
+        while True:
+            key = self.status_window.getkey().lower()
+            if key in ["r", "q"]:
+                break
+
+        return key == "q"
 
     key_to_pos = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
                   "q", "w", "e", "r", "t", "y", "u", "i", "o", "p"
-                  "a", "s", "d", "f", "g", "h", "j", "k", "l"]
+                                                               "a", "s", "d", "f", "g", "h", "j", "k", "l"]
 
     def select_move(self, moves):
         self.moves_window.clear()
@@ -129,4 +135,3 @@ class CursesDisplay(Display):
         self.moves_window.refresh()
 
         return moves[pos]
-

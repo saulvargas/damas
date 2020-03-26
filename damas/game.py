@@ -11,35 +11,39 @@ class Game:
         self.players = {+1: player_w, -1: player_b}
 
     def loop(self):
-        self.display.render_board(self.board)
-
-        player = +1
-        turns = 0
-
-        possible_moves = self.board.get_all_moves(player)
         while True:
-            if player == +1:
-                turns += 1
+            board = self.board.copy()
 
-            self.display.new_turn(player)
+            self.display.render_board(board)
 
-            move = self.players[player].choose_move(possible_moves)
+            player = +1
+            turns = 0
 
-            more_moves = self.board.move(player, move)
-            self.display.render_board(self.board)
+            possible_moves = board.get_all_moves(player)
+            while True:
+                if player == +1:
+                    turns += 1
 
-            while more_moves:
-                move = self.players[player].choose_move(more_moves)
-                more_moves = self.board.move(player, move)
+                self.display.new_turn(player)
 
-                self.display.render_board(self.board)
+                move = self.players[player].choose_move(possible_moves)
 
-            possible_moves = self.board.get_all_moves(-player)
+                more_moves = board.move(player, move)
+                self.display.render_board(board)
 
-            if possible_moves:
-                self.display.end_turn(player)
-                player = -player
-            else:
-                self.display.end_game(player)
+                while more_moves:
+                    move = self.players[player].choose_move(more_moves)
+                    more_moves = board.move(player, move)
 
-                return player, turns
+                    self.display.render_board(board)
+
+                possible_moves = board.get_all_moves(-player)
+
+                if possible_moves:
+                    self.display.end_turn(player)
+                    player = -player
+                else:
+                    if self.display.end_game(player):
+                        return player, turns
+                    else:
+                        break
