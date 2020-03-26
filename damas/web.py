@@ -73,7 +73,7 @@ async def echo(websocket: WebSocketServerProtocol, path: str):
 def main():
     start_server = websockets.serve(echo, "localhost", 4444)
     asyncio.get_event_loop().run_until_complete(start_server)
-    threading.Thread(target=lambda: webbrowser.open("../index.html", new=2)).start()
+    threading.Thread(target=lambda: webbrowser.open("index.html", new=2)).start()
     asyncio.get_event_loop().run_forever()
 
 
