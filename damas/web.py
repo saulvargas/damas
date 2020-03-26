@@ -1,15 +1,17 @@
 import asyncio
 import json
+import sys
 import threading
 import webbrowser
-import websockets
+from os import path
 
+import websockets
 from websockets import WebSocketServerProtocol
 
 from damas.board import Board
 from damas.display import Display
 from damas.game import Game
-from damas.player import MinimaxPlayer, RandomPlayer, HumanPlayer
+from damas.player import MinimaxPlayer, HumanPlayer
 
 
 class WebsocketDisplay(Display):
@@ -82,9 +84,12 @@ async def echo(websocket: WebSocketServerProtocol, path: str):
 
 
 def main():
+    bundle_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
+    index_path = path.join(bundle_dir, "index.html")
+
     start_server = websockets.serve(echo, "localhost", 4444)
     asyncio.get_event_loop().run_until_complete(start_server)
-    threading.Thread(target=lambda: webbrowser.open("index.html", new=2)).start()
+    threading.Thread(target=lambda: webbrowser.open(index_path, new=2)).start()
     asyncio.get_event_loop().run_forever()
 
 
