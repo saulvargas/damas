@@ -9,7 +9,7 @@ from websockets import WebSocketServerProtocol
 from damas.board import Board
 from damas.display import Display
 from damas.game import Game
-from damas.player import MinimaxPlayer
+from damas.player import MinimaxPlayer, RandomPlayer
 
 
 class WebsocketDisplay(Display):
@@ -59,11 +59,17 @@ async def echo(websocket: WebSocketServerProtocol, path: str):
 
     board = Board()
     board.start()
+    # board.add((0, 0), +1)
+    # board.add((0, 6), +1)
+    # board.add((7, 5), +2)
+    # board.add((0, 2), -2)
+    # board.add((0, 4), -2)
 
     display = WebsocketDisplay(websocket)
 
-    player1 = MinimaxPlayer(board, +1, depth=4, seed=1)
-    player2 = MinimaxPlayer(board, -1, depth=5, seed=2)
+    player1 = MinimaxPlayer(board, +1, depth=2, seed=1)
+    # player1 = RandomPlayer(board, +1, seed=1)
+    player2 = MinimaxPlayer(board, -1, depth=5, seed=1)
 
     game = Game(board, display, player1, player2)
 

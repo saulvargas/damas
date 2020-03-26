@@ -11,8 +11,7 @@ class Game:
         self.players = {+1: player_w, -1: player_b}
 
     def loop(self):
-        board = self.board.copy()
-        self.display.render_board(board)
+        self.display.render_board(self.board)
 
         player, opponent = -1, +1
         turns = 0
@@ -21,7 +20,7 @@ class Game:
         while True:
             if not moves:
                 player, opponent = opponent, player
-                moves = board.get_all_moves(player)
+                moves = self.board.get_all_moves(player)
 
                 if moves and (turns > 0):
                     self.display.end_turn(opponent)
@@ -33,13 +32,15 @@ class Game:
                 if player == +1:
                     turns += 1
 
+            if (turns == 6) and (player == -1):
+                print("dale")
+
             move = self.players[player].choose_move(moves)
-            moves = board.move(player, move)
-            self.display.render_board(board)
+            moves = self.board.move(player, move)
+            self.display.render_board(self.board)
 
     async def async_loop(self):
-        board = self.board.copy()
-        await self.display.render_board(board)
+        await self.display.render_board(self.board)
 
         player, opponent = -1, +1
         turns = 0
@@ -48,7 +49,7 @@ class Game:
         while True:
             if not moves:
                 player, opponent = opponent, player
-                moves = board.get_all_moves(player)
+                moves = self.board.get_all_moves(player)
 
                 if moves and (turns > 0):
                     await self.display.end_turn(opponent)
@@ -61,5 +62,5 @@ class Game:
                     turns += 1
 
             move = self.players[player].choose_move(moves)
-            moves = board.move(player, move)
-            await self.display.render_board(board)
+            moves = self.board.move(player, move)
+            await self.display.render_board(self.board)
