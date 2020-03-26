@@ -1,4 +1,5 @@
 import asyncio
+import json
 import threading
 import webbrowser
 import websockets
@@ -17,18 +18,37 @@ class WebsocketDisplay(Display):
         self.websocket = websocket
 
     async def render_board(self, board: Board):
-        await self.websocket.send("render board")
+        msg = {
+            "event": "render_board",
+            "board": board.values.tolist()
+        }
+
+        await self.websocket.send(json.dumps(msg))
+        await self.websocket.recv()
 
     async def new_turn(self, player):
-        await self.websocket.send("new turn")
+        msg = {
+            "event": "new_turn",
+            "player": player
+        }
+
+        await self.websocket.send(json.dumps(msg))
 
     async def end_turn(self, player):
-        await self.websocket.send("end turn")
+        msg = {
+            "event": "end_turn",
+            "player": player
+        }
+
+        await self.websocket.send(json.dumps(msg))
 
     async def end_game(self, winner):
-        await self.websocket.send("end game")
+        msg = {
+            "event": "new_turn",
+            "player": winner
+        }
 
-        return True
+        await self.websocket.send(json.dumps(msg))
 
     async def select_move(self, moves):
         raise NotImplemented
@@ -39,14 +59,15 @@ async def echo(websocket: WebSocketServerProtocol, path: str):
 
     board = Board()
     board.start()
+
     display = WebsocketDisplay(websocket)
+
     player1 = MinimaxPlayer(board, +1, depth=4, seed=1)
-    player2 = MinimaxPlayer(board, -1, depth=4, seed=1)
+    player2 = MinimaxPlayer(board, -1, depth=5, seed=2)
+
     game = Game(board, display, player1, player2)
 
-    await websocket.send("dale")
-
-    # await game.loop()
+    await game.async_loop()
 
 
 def main():
