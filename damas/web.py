@@ -60,8 +60,6 @@ class WebsocketDisplay(Display):
         move = json.loads(await self.websocket.recv())
         move = ((move[0][0], move[0][1]), (move[1][0], move[1][1]))
 
-        print(move)
-
         return move
 
 
@@ -76,7 +74,7 @@ async def echo(websocket: WebSocketServerProtocol, path: str):
     player1 = HumanPlayer(board, +1, display)
     # player1 = MinimaxPlayer(board, +1, depth=2, seed=1)
     # player1 = RandomPlayer(board, +1, seed=1)
-    player2 = MinimaxPlayer(board, -1, depth=5, seed=1)
+    player2 = MinimaxPlayer(board, -1, depth=6, seed=1)
 
     game = Game(board, display, player1, player2)
 
