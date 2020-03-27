@@ -76,6 +76,7 @@ playButton.onclick = function() {
 
     playModal.style.opacity = "0";
     playModal.style.pointerEvents = "none";
+    playButton.disabled = true;
 
     var whitesSelect = document.getElementById("whites-select").value;
     var blacksSelect = document.getElementById("blacks-select").value;

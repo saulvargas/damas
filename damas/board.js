@@ -169,7 +169,7 @@ function play(player_w, player_b) {
             ctx.fillStyle = "rgb(255, 0, 0)";
             ctx.fillText(say, canvas.width / 2, canvas.height / 2 + 16, canvas.width);
         } else {
-            console.log(msg);
+//            console.log(msg);
         }
     }
 }
