@@ -15,6 +15,8 @@ class Board:
     def __init__(self):
         self.values = np.zeros((NUM_ROWS, NUM_COLS), dtype=np.int8)
         self.turn_for = 0
+        self.turn_count = 0
+        self.turn_end = False
 
     def __getitem__(self, pos: Tuple[int, int]) -> int:
         return self.values[pos]
@@ -26,6 +28,8 @@ class Board:
         board = Board()
         board.values = self.values.copy()
         board.turn_for = self.turn_for
+        board.turn_count = self.turn_count
+        board.turn_end = self.turn_end
 
         return board
 
@@ -43,6 +47,8 @@ class Board:
 
                 self.add((row, col), value)
         self.turn_for = +1
+        self.turn_count = 1
+        self.turn_end = False
 
     @staticmethod
     def _moves_to(pos_a: Tuple[int, int], value_a: int, length: int, margin: int) -> np.ndarray:
@@ -105,6 +111,10 @@ class Board:
         return np.abs(pos_a[0] - pos_b[0]) == 2
 
     def move(self, move):
+        if self.turn_end and (self.turn_for == +1):
+            self.turn_end = False
+            self.turn_count += 1
+
         pos_a, pos_b = move
 
         self[pos_a], self[pos_b] = 0, self[pos_a]
@@ -123,5 +133,6 @@ class Board:
 
         if not more_moves:
             self.turn_for = -self.turn_for
+            self.turn_end = True
 
         return more_moves

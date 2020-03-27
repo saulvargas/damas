@@ -112,8 +112,6 @@ canvas.onclick = function(e) {
     ctx.fillStyle = COLOR_SELECTED;
     ctx.fillRect(x, y, CELL_WIDTH, CELL_HEIGHT);
 
-    console.log([row, col]);
-
     if (!posFrom) {
         posFrom = [row, col];
     } else {

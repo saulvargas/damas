@@ -60,6 +60,7 @@ class MinimaxPlayer(Player):
         self._rs.shuffle(moves)
         for move in moves:
             next_board = board.copy()
+
             more_moves = next_board.move(move)
             while self._compact and (len(more_moves) == 1):
                 more_moves = next_board.move(more_moves[0])

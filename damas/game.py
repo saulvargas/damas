@@ -15,45 +15,43 @@ class Game:
     def loop(self):
         self.display.render_board(self.board)
 
-        turns = 0
-        moves = None
-
         while True:
+            moves = self.board.get_all_moves()
             if not moves:
-                moves = self.board.get_all_moves()
+                break
 
+            self.display.new_turn(self.board.turn_for)
+
+            while True:
+                move = self.players[self.board.turn_for].choose_move(moves)
+                moves = self.board.move(move)
+                self.display.render_board(self.board)
                 if not moves:
-                    self.display.end_game(winner=-self.board.turn_for)
-                    return -self.board.turn_for, turns
+                    break
 
-                self.display.new_turn(self.board.turn_for)
-                if self.board.turn_for == +1:
-                    turns += 1
+        self.display.end_game(winner=-self.board.turn_for)
 
-            move = self.players[self.board.turn_for].choose_move(moves)
-            moves = self.board.move(move)
-            self.display.render_board(self.board)
+        return -self.board.turn_for, self.board.turn_count
 
     async def async_loop(self):
         await self.display.render_board(self.board)
 
-        turns = 0
-        moves = None
-
         while True:
+            moves = self.board.get_all_moves()
             if not moves:
-                moves = self.board.get_all_moves()
+                break
 
+            await self.display.new_turn(self.board.turn_for)
+
+            while True:
+                move = self.players[self.board.turn_for].choose_move(moves)
+                if asyncio.iscoroutine(move):
+                    move = await move
+                moves = self.board.move(move)
+                await self.display.render_board(self.board)
                 if not moves:
-                    await self.display.end_game(winner=-self.board.turn_for)
-                    return -self.board.turn_for, turns
+                    break
 
-                await self.display.new_turn(self.board.turn_for)
-                if self.board.turn_for == +1:
-                    turns += 1
+        await self.display.end_game(winner=-self.board.turn_for)
 
-            move = self.players[self.board.turn_for].choose_move(moves)
-            if asyncio.iscoroutine(move):
-                move = await move
-            moves = self.board.move(move)
-            await self.display.render_board(self.board)
+        return -self.board.turn_for, self.board.turn_count
