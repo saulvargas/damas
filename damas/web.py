@@ -11,7 +11,7 @@ from websockets import WebSocketServerProtocol
 from damas.board import Board
 from damas.display import Display
 from damas.game import Game
-from damas.player import MinimaxPlayer, HumanPlayer
+from damas.player import MinimaxPlayer, HumanPlayer, RandomPlayer
 
 
 class WebsocketDisplay(Display):
@@ -46,8 +46,8 @@ class WebsocketDisplay(Display):
 
     async def end_game(self, winner):
         msg = {
-            "event": "new_turn",
-            "player": winner
+            "event": "end_game",
+            "winner": winner
         }
 
         await self.websocket.send(json.dumps(msg))
@@ -65,6 +65,15 @@ class WebsocketDisplay(Display):
         return move
 
 
+def select_player(selected, board, player, display):
+    if selected == "human":
+        return HumanPlayer(board, player, display)
+    elif selected == "minimax":
+        return MinimaxPlayer(board, player, depth=6)
+    elif selected == "random":
+        return RandomPlayer(board, player)
+
+
 async def echo(websocket: WebSocketServerProtocol, _):
     display = WebsocketDisplay(websocket)
 
@@ -75,15 +84,8 @@ async def echo(websocket: WebSocketServerProtocol, _):
     board = Board()
     board.start()
 
-    if config["player_w"] == "human":
-        player1 = HumanPlayer(board, +1, display)
-    else:
-        player1 = MinimaxPlayer(board, +1, depth=6)
-
-    if config["player_b"] == "human":
-        player2 = HumanPlayer(board, -1, display)
-    else:
-        player2 = MinimaxPlayer(board, -1, depth=6)
+    player1 = select_player(config["player_w"], board, +1, display)
+    player2 = select_player(config["player_b"], board, -1, display)
 
     game = Game(board, display, player1, player2)
 

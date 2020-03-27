@@ -153,6 +153,21 @@ function play(player_w, player_b) {
             }, 500);
         } else if (msg.event === "select_move") {
             moves = msg.moves;
+        } else if (msg.event === "end_game") {
+            var ctx = canvas.getContext('2d');
+            var say;
+            if (msg.winner == -1) {
+                say = "GANAN NEGRAS";
+            } else if (msg.winner == +1) {
+                say = "GANAN BLANCAS";
+            } else {
+                say = "EMPATE";
+            }
+
+            ctx.font = "48px serif";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "rgb(255, 0, 0)";
+            ctx.fillText(say, canvas.width / 2, canvas.height / 2 + 16, canvas.width);
         } else {
             console.log(msg);
         }
