@@ -14,6 +14,7 @@ class Board:
 
     def __init__(self):
         self.values = np.zeros((NUM_ROWS, NUM_COLS), dtype=np.int8)
+        self.turn_for = 0
 
     def __getitem__(self, pos: Tuple[int, int]) -> int:
         return self.values[pos]
@@ -24,6 +25,7 @@ class Board:
     def copy(self) -> "Board":
         board = Board()
         board.values = self.values.copy()
+        board.turn_for = self.turn_for
 
         return board
 
@@ -40,6 +42,7 @@ class Board:
                     col = NUM_COLS - 1 - col
 
                 self.add((row, col), value)
+        self.turn_for = +1
 
     @staticmethod
     def _moves_to(pos_a: Tuple[int, int], value_a: int, length: int, margin: int) -> np.ndarray:
@@ -84,8 +87,8 @@ class Board:
         else:
             return []
 
-    def get_all_moves(self, player):
-        poss_a = [tuple(xy.tolist()) for xy in np.transpose(np.nonzero(self.values * player > 0))]
+    def get_all_moves(self):
+        poss_a = [tuple(xy.tolist()) for xy in np.transpose(np.nonzero(self.values * self.turn_for > 0))]
 
         moves2 = [m for pos_a in poss_a for m in self._get_moves2_from(pos_a)]
         if moves2:
@@ -95,21 +98,30 @@ class Board:
 
         return moves1
 
-    def move(self, player, move):
+    @staticmethod
+    def is_jump(move):
+        pos_a, pos_b = move
+
+        return np.abs(pos_a[0] - pos_b[0]) == 2
+
+    def move(self, move):
         pos_a, pos_b = move
 
         self[pos_a], self[pos_b] = 0, self[pos_a]
 
         more_moves = []
-        if np.abs(pos_a[0] - pos_b[0]) == 2:
+        if self.is_jump(move):
             pos_c = tuple((np.array(pos_a) + np.array(pos_b)) // 2)
             self[pos_c] = 0
             more_moves = self._get_moves2_from(pos_b)
 
-        if (player == +1) and (pos_b[0] == NUM_ROWS - 1):
+        if (self.turn_for == +1) and (pos_b[0] == NUM_ROWS - 1):
             self[pos_b] = +2
 
-        if (player == -1) and (pos_b[0] == 0):
+        if (self.turn_for == -1) and (pos_b[0] == 0):
             self[pos_b] = -2
+
+        if not more_moves:
+            self.turn_for = -self.turn_for
 
         return more_moves
