@@ -48,23 +48,31 @@ class MinimaxPlayer(Player):
             return balance
 
     def _minimax(self, board: Board, moves, depth: int, alpha, beta, player: int):
+        if (depth == 0) or (not moves):
+            return self._score(board), None
+
         if player == self._player:
             best_score, best_move = -1000, None
         else:
             best_score, best_move = +1000, None
 
-        if (depth == 0) or (not moves):
-            return self._score(board), None
-
         self._rs.shuffle(moves)
         for move in moves:
             next_board = board.copy()
-            next_moves = next_board.move(player, move)
-            if next_moves:
-                score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta, player)
+            more_moves = next_board.move(player, move)
+
+            if more_moves:
+                next_moves, next_player = more_moves, player
             else:
-                next_moves = next_board.get_all_moves(-player)
-                score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta, -player)
+                next_moves, next_player = next_board.get_all_moves(-player), -player
+
+            next_depth = depth - 1
+            # if len(next_moves) == 1:
+            #     next_depth = depth
+            # else:
+            #     next_depth = depth - 1
+
+            score, _ = self._minimax(next_board, next_moves, next_depth, alpha, beta, next_player)
 
             if player == self._player:
                 if score > best_score:
