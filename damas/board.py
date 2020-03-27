@@ -42,7 +42,7 @@ class Board:
                 self.add((row, col), value)
 
     @staticmethod
-    def _moves_to(pos_a: Tuple[int, int], value_a: int, length: int) -> np.ndarray:
+    def _moves_to(pos_a: Tuple[int, int], value_a: int, length: int, margin: int) -> np.ndarray:
         b = np.array(pos_a, dtype=np.int8)
         a = length * np.sign(value_a)
 
@@ -51,32 +51,38 @@ class Board:
         else:
             positions = ALL_MOVES * a + b
 
-        valid = (positions[:, 0] >= 0) & (positions[:, 0] < NUM_ROWS) & \
-                (positions[:, 1] >= 0) & (positions[:, 1] < NUM_COLS)
+        valid = (positions[:, 0] >= margin) & (positions[:, 0] < (NUM_ROWS - margin)) & \
+                (positions[:, 1] >= margin) & (positions[:, 1] < (NUM_COLS - margin))
 
         return positions[valid]
 
     def _get_moves1_from(self, pos_a: Tuple[int, int]):
         value_a = self[pos_a]
 
-        poss_b = Board._moves_to(pos_a, value_a, length=1)
+        poss_b = Board._moves_to(pos_a, value_a, length=1, margin=0)
         values_b = self[(poss_b[:, 0], poss_b[:, 1])]
-        valid = values_b == 0
-        moves1 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid]]
+        valid_b = values_b == 0
+
+        moves1 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid_b]]
 
         return moves1
 
     def _get_moves2_from(self, pos_a: Tuple[int, int]):
         value_a = self[pos_a]
 
-        poss_b = Board._moves_to(pos_a, value_a, length=2)
-        values_b = self[(poss_b[:, 0], poss_b[:, 1])]
-        poss_c = (np.array(pos_a) + poss_b) // 2
+        poss_c = Board._moves_to(pos_a, value_a, length=1, margin=1)
         values_c = self[(poss_c[:, 0], poss_c[:, 1])]
-        valid = (values_b == 0) & (value_a * values_c < 0)
-        moves2 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid]]
+        valid_c = (value_a * values_c) < 0
 
-        return moves2
+        if np.any(valid_c):
+            poss_b = 2 * poss_c[valid_c] - np.array(pos_a)
+            values_b = self[(poss_b[:, 0], poss_b[:, 1])]
+            valid_b = values_b == 0
+            moves2 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid_b]]
+
+            return moves2
+        else:
+            return []
 
     def get_all_moves(self, player):
         poss_a = [tuple(xy.tolist()) for xy in np.transpose(np.nonzero(self.values * player > 0))]
