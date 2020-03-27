@@ -37,7 +37,6 @@ class Game:
             move = self.players[player].choose_move(moves)
             moves = self.board.move(player, move)
             self.display.render_board(self.board)
-            print(f"{turns}\t{player}\t{move}")
 
     async def async_loop(self):
         await self.display.render_board(self.board)
@@ -66,4 +65,3 @@ class Game:
                 move = await move
             moves = self.board.move(player, move)
             await self.display.render_board(self.board)
-            print(f"{turns}\t{player}\t{move}")

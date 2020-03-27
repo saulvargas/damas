@@ -12,8 +12,8 @@ def main():
     for i in range(10):
         board = Board()
         board.start()
-        player_w = MinimaxPlayer(board, player=+1, depth=2, seed=i)
-        player_b = MinimaxPlayer(board, player=-1, depth=2, seed=i)
+        player_w = MinimaxPlayer(board, player=+1, depth=4, seed=i)
+        player_b = MinimaxPlayer(board, player=-1, depth=4, seed=i)
 
         game = Game(board, display, player_w, player_b)
 

@@ -32,11 +32,12 @@ class RandomPlayer(Player):
 
 class MinimaxPlayer(Player):
 
-    def __init__(self, board: Board, player: int, depth: int, seed=None, conservative=False):
+    def __init__(self, board: Board, player: int, depth: int, seed=None, conservative=False, compact=True):
         super().__init__(board, player)
         self._depth = depth
         self._rs = random.Random(seed)
         self._conservative = conservative
+        self._compact = compact
 
     def _score(self, board: Board):
         # TODO: replace really bad heuristic!
@@ -60,19 +61,14 @@ class MinimaxPlayer(Player):
         for move in moves:
             next_board = board.copy()
             more_moves = next_board.move(player, move)
+            while self._compact and (len(more_moves) == 1):
+                more_moves = next_board.move(player, more_moves[0])
 
             if more_moves:
                 next_moves, next_player = more_moves, player
             else:
                 next_moves, next_player = next_board.get_all_moves(-player), -player
-
-            next_depth = depth - 1
-            # if len(next_moves) == 1:
-            #     next_depth = depth
-            # else:
-            #     next_depth = depth - 1
-
-            score, _ = self._minimax(next_board, next_moves, next_depth, alpha, beta, next_player)
+            score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta, next_player)
 
             if player == self._player:
                 if score > best_score:
