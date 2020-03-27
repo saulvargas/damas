@@ -32,15 +32,19 @@ class RandomPlayer(Player):
 
 class MinimaxPlayer(Player):
 
-    def __init__(self, board: Board, player: int, depth: int, seed=None):
+    def __init__(self, board: Board, player: int, depth: int, seed=None, conservative=False):
         super().__init__(board, player)
         self._depth = depth
         self._rs = random.Random(seed)
+        self._conservative = conservative
 
     def _score(self, board: Board):
         # TODO: replace really bad heuristic!
         balance = np.sum(board.values)
-        return balance * self._player
+        if self._conservative:
+            return balance * self._player + np.sum(np.abs(board.values))
+        else:
+            return balance
 
     def _minimax(self, board: Board, moves, depth: int, alpha, beta, player: int):
         if player == self._player:
