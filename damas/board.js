@@ -25,7 +25,9 @@ window.addEventListener('resize', function() {
     CROWN_OUTER = 1 / 4 * CELL_HEIGHT;
     CROWN_INNER = 1 / 20 * CELL_HEIGHT;
 
-    draw(board);
+    if (board) {
+        draw(board);
+    }
 });
 
 function drawBoard(ctx) {
@@ -89,8 +91,7 @@ function draw(values) {
     }
 }
 
-webSocket = new WebSocket("ws://localhost:4444");
-
+var webSocket = null;
 var moves = null;
 var posFrom = null;
 
@@ -133,18 +134,27 @@ canvas.onclick = function(e) {
     }
 }
 
-webSocket.onmessage = function (event) {
-    var msg = JSON.parse(event.data);
+function play(player_w, player_b) {
+    webSocket = new WebSocket("ws://localhost:4444");
 
-    if (msg.event === "render_board") {
-        board = msg.board;
-        draw(board);
-        window.setTimeout(function() {
-            webSocket.send("OK");
-        }, 500);
-    } else if (msg.event === "select_move") {
-        moves = msg.moves;
-    } else {
-        console.log(msg);
+    var msg = {"event": "new_game", "player_w": player_w, "player_b": player_b}
+    webSocket.onopen = function() {
+        webSocket.send(JSON.stringify(msg))
+    }
+
+    webSocket.onmessage = function (event) {
+        var msg = JSON.parse(event.data);
+
+        if (msg.event === "render_board") {
+            board = msg.board;
+            draw(board);
+            window.setTimeout(function() {
+                webSocket.send("OK");
+            }, 500);
+        } else if (msg.event === "select_move") {
+            moves = msg.moves;
+        } else {
+            console.log(msg);
+        }
     }
 }

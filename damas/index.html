@@ -3,13 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <title>Damas</title>
+
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 99999;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal:target {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal > div {
+            width: 300px;
+            position: relative;
+            margin: 10% auto;
+            padding: 20px;
+            border-style: solid;
+        }
+
+
+
+
+    </style>
 </head>
 
 <body>
 
+<div id="play-modal" class="modal">
+    <div>
+        <div>
+            <div style="width: 80%; float: left;">
+                <div style="float: right">
+                    <label>BLANCAS:</label>
+                    <select name="whites" id="whites-select">
+                        <option value="human" selected>Persona</option>
+                        <option value="minimax">M&aacute;quina</option>
+                    </select>
+                </div>
+                <div style="float: right">
+                    <label>NEGRAS:</label>
+                    <select name="blacks" id="blacks-select">
+                        <option value="human">Persona</option>
+                        <option value="minimax" selected>M&aacute;quina</option>
+                    </select>
+                </div>
+            </div>
+            <div style="width: 20%; float: right;"></div>
+        </div>
+        <button id="play-button" style="width: 100%;" autofocus>JUGAR</button>
+    </div>
+</div>
+
+
 <canvas id="board" height="640" width="640"></canvas>
 
 <script type="text/javascript">
+
+var playButton = document.getElementById("play-button");
+
+playButton.onclick = function() {
+    var playModal = document.getElementById("play-modal");
+
+    playModal.style.opacity = "0";
+    playModal.style.pointerEvents = "none";
+
+    var whitesSelect = document.getElementById("whites-select").value;
+    var blacksSelect = document.getElementById("blacks-select").value;
+
+    play(whitesSelect, blacksSelect);
+}
 
 function resizeCanvas() {
     let vh = window.innerHeight * 0.01;
@@ -29,7 +99,6 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 
 resizeCanvas();
-
 </script>
 
 <script type="application/javascript" src="board.js"></script>

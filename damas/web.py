@@ -65,22 +65,31 @@ class WebsocketDisplay(Display):
         return move
 
 
-async def echo(websocket: WebSocketServerProtocol, path: str):
-    print("New connection")
+async def echo(websocket: WebSocketServerProtocol, _):
+    display = WebsocketDisplay(websocket)
+
+    print("New game")
+    config = json.loads(await websocket.recv())
+    assert config["event"] == "new_game"
 
     board = Board()
     board.start()
 
-    display = WebsocketDisplay(websocket)
+    if config["player_w"] == "human":
+        player1 = HumanPlayer(board, +1, display)
+    else:
+        player1 = MinimaxPlayer(board, +1, depth=6)
 
-    player1 = HumanPlayer(board, +1, display)
-    # player1 = MinimaxPlayer(board, +1, depth=2, seed=1)
-    # player1 = RandomPlayer(board, +1, seed=1)
-    player2 = MinimaxPlayer(board, -1, depth=6, seed=1)
+    if config["player_b"] == "human":
+        player2 = HumanPlayer(board, -1, display)
+    else:
+        player2 = MinimaxPlayer(board, -1, depth=6)
 
     game = Game(board, display, player1, player2)
 
     await game.async_loop()
+
+    print("Game over")
 
 
 def main():
