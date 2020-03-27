@@ -40,9 +40,10 @@ class MinimaxPlayer(Player):
 
     def _score(self, board: Board):
         # TODO: replace really bad heuristic!
-        balance = np.sum(board.values)
+        balance = np.sum(board.values) * self._player
+        total_pieces = np.sum(np.abs(board.values))
         if self._conservative:
-            return balance * self._player + np.sum(np.abs(board.values))
+            return balance + total_pieces
         else:
             return balance
 
