@@ -22,9 +22,7 @@ class Game:
             if not moves:
                 moves = self.board.get_all_moves()
 
-                if moves and (turns > 0):
-                    self.display.end_turn(-self.board.turn_for)
-                elif not moves:
+                if not moves:
                     self.display.end_game(winner=-self.board.turn_for)
                     return -self.board.turn_for, turns
 
@@ -46,9 +44,7 @@ class Game:
             if not moves:
                 moves = self.board.get_all_moves()
 
-                if moves and (turns > 0):
-                    await self.display.end_turn(-self.board.turn_for)
-                elif not moves:
+                if not moves:
                     await self.display.end_game(winner=-self.board.turn_for)
                     return -self.board.turn_for, turns
 

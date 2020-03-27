@@ -36,14 +36,6 @@ class WebsocketDisplay(Display):
 
         await self.websocket.send(json.dumps(msg))
 
-    async def end_turn(self, player):
-        msg = {
-            "event": "end_turn",
-            "player": player
-        }
-
-        await self.websocket.send(json.dumps(msg))
-
     async def end_game(self, winner):
         msg = {
             "event": "end_game",

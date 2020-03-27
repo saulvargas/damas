@@ -14,10 +14,6 @@ class Display(ABC):
         pass
 
     @abstractmethod
-    def end_turn(self, player):
-        pass
-
-    @abstractmethod
     def end_game(self, winner):
         pass
 
@@ -32,9 +28,6 @@ class NoDisplay(Display):
         pass
 
     def new_turn(self, player):
-        pass
-
-    def end_turn(self, player):
         pass
 
     def end_game(self, winner):

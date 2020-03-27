@@ -1,4 +1,5 @@
 import curses
+from time import sleep
 
 from damas.board import Board
 from damas.board import NUM_ROWS, NUM_COLS
@@ -54,14 +55,10 @@ class CursesDisplay(Display):
             return "BLACKS"
 
     def new_turn(self, player):
+        sleep(1)
         self.status_window.clear()
         self.status_window.addstr(0, 0, f"TURN FOR {self._player_name(player)}")
         self.status_window.refresh()
-
-    def end_turn(self, player):
-        self.status_window.clear()
-        self.status_window.addstr(0, 0, f"END OF {self._player_name(player)} TURN - PRESS ANY KEY TO CONTINUE")
-        self.status_window.getkey()
 
     def end_game(self, winner):
         self.status_window.clear()
