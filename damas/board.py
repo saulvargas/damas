@@ -18,17 +18,20 @@ class DrawException(Exception):
 
 class Board:
 
-    def __init__(self):
+    def __init__(self, add_pieces=True):
         self.values = np.zeros((NUM_ROWS, NUM_COLS), dtype=np.int8)
-        for value in [+1, -1]:
-            for i in range(NUM_PIECES):
-                row = (2 * i) // NUM_COLS
-                col = (2 * i) % NUM_COLS + row % 2
-                if value < 0:
-                    row = NUM_ROWS - 1 - row
-                    col = NUM_COLS - 1 - col
+        if add_pieces:
+            for value in [+1, -1]:
+                for i in range(NUM_PIECES):
+                    row = (2 * i) // NUM_COLS
+                    col = (2 * i) % NUM_COLS + row % 2
+                    if value < 0:
+                        row = NUM_ROWS - 1 - row
+                        col = NUM_COLS - 1 - col
 
-                self.add((row, col), value)
+                    self[(row, col)] = value
+
+        self.previous_values = [self.values.tobytes()]
 
         self.turn_for = +1
         self.loop_count = 1
@@ -44,8 +47,9 @@ class Board:
         self.values[pos] = value
 
     def copy(self) -> "Board":
-        board = Board()
+        board = Board(add_pieces=False)
         board.values = self.values.copy()
+        board.previous_values = self.previous_values.copy()
 
         board.turn_for = self.turn_for
         board.loop_count = self.loop_count
@@ -55,9 +59,6 @@ class Board:
         board.last_captured = self.last_captured.copy()
 
         return board
-
-    def add(self, pos: Tuple[int, int], value: int):
-        self[pos] = value
 
     @staticmethod
     def _moves_to(pos_a: Tuple[int, int], value_a: int, length: int, margin: int) -> np.ndarray:
@@ -130,20 +131,26 @@ class Board:
 
         more_moves = []
         if self.is_jump(move):
+            self.previous_values.clear()
+            self.last_captured[self.turn_for] = -1
+
             pos_c = tuple((np.array(pos_a) + np.array(pos_b)) // 2)
             self[pos_c] = 0
             more_moves = self._get_moves2_from(pos_b)
-            self.last_captured[self.turn_for] = -1
 
         if (self.turn_for == +1) and (pos_b[0] == NUM_ROWS - 1) and (self[pos_b] == +1):
+            self.previous_values.clear()
             self.last_crowned[+1] = -1
             self[pos_b] = +2
 
         if (self.turn_for == -1) and (pos_b[0] == 0) and (self[pos_b] == -1):
+            self.previous_values.clear()
             self.last_crowned[-1] = -1
             self[pos_b] = -2
 
         if not more_moves:
+            self.previous_values.append(self.values.tobytes())
+
             self.last_captured[self.turn_for] += 1
             self.last_crowned[self.turn_for] += 1
             self.turn_for = -self.turn_for
@@ -154,6 +161,19 @@ class Board:
         return more_moves
 
     def draw_conditions(self):
+        return self.draw_condition_1_32_2() or self.draw_condition_1_32_1()
+
+    def draw_condition_1_32_1(self):
+        count = 0
+        last = self.previous_values[-1]
+        for previous in self.previous_values[:-1]:
+            if last == previous:
+                count += 1
+                if count == 2:
+                    return True
+        return False
+
+    def draw_condition_1_32_2(self):
         return (self.last_crowned[+1] >= TURNS_DRAW) and \
                (self.last_crowned[-1] >= TURNS_DRAW) and \
                (self.last_captured[+1] >= TURNS_DRAW) and \
