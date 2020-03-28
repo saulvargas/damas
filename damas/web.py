@@ -74,7 +74,6 @@ async def echo(websocket: WebSocketServerProtocol, _):
     assert config["event"] == "new_game"
 
     board = Board()
-    board.start()
 
     player1 = select_player(config["player_w"], board, +1, display)
     player2 = select_player(config["player_b"], board, -1, display)

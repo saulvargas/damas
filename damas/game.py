@@ -1,6 +1,6 @@
 import asyncio
 
-from damas.board import Board
+from damas.board import Board, DrawException
 from damas.display import Display
 from damas.player import Player
 
@@ -24,14 +24,19 @@ class Game:
 
             while True:
                 move = self.players[self.board.turn_for].choose_move(moves)
-                moves = self.board.move(move)
+                try:
+                    moves = self.board.move(move)
+                except DrawException:
+                    self.display.render_board(self.board)
+                    self.display.end_game(winner=0)
+                    return 0, self.board.loop_count
                 self.display.render_board(self.board)
                 if not moves:
                     break
 
         self.display.end_game(winner=-self.board.turn_for)
 
-        return -self.board.turn_for, self.board.turn_count
+        return -self.board.turn_for, self.board.loop_count
 
     async def async_loop(self):
         await self.display.render_board(self.board)
@@ -47,11 +52,16 @@ class Game:
                 move = self.players[self.board.turn_for].choose_move(moves)
                 if asyncio.iscoroutine(move):
                     move = await move
-                moves = self.board.move(move)
+                try:
+                    moves = self.board.move(move)
+                except DrawException:
+                    await self.display.render_board(self.board)
+                    await self.display.end_game(winner=0)
+                    return 0, self.board.loop_count
                 await self.display.render_board(self.board)
                 if not moves:
                     break
 
         await self.display.end_game(winner=-self.board.turn_for)
 
-        return -self.board.turn_for, self.board.turn_count
+        return -self.board.turn_for, self.board.loop_count

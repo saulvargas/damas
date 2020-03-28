@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from damas.board import Board
+from damas.board import Board, DrawException
 from damas.display import Display
 
 
@@ -31,6 +31,7 @@ class RandomPlayer(Player):
 
 
 class MinimaxPlayer(Player):
+    DRAW_SCORE = -500
 
     def __init__(self, board: Board, player: int, depth: int, seed=None, conservative=False, compact=True):
         super().__init__(board, player)
@@ -61,12 +62,16 @@ class MinimaxPlayer(Player):
         for move in moves:
             next_board = board.copy()
 
-            more_moves = next_board.move(move)
-            while self._compact and (len(more_moves) == 1):
-                more_moves = next_board.move(more_moves[0])
+            try:
+                more_moves = next_board.move(move)
+            except DrawException:
+                score = self.DRAW_SCORE
+            else:
+                while self._compact and (len(more_moves) == 1):
+                    more_moves = next_board.move(more_moves[0])
 
-            next_moves = more_moves if more_moves else next_board.get_all_moves()
-            score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta)
+                next_moves = more_moves if more_moves else next_board.get_all_moves()
+                score, _ = self._minimax(next_board, next_moves, depth - 1, alpha, beta)
 
             if board.turn_for == self._player:
                 if score > best_score:

@@ -92,7 +92,6 @@ class CursesDisplay(Display):
 
 def main(_):
     board = Board()
-    board.start()
 
     display = CursesDisplay()
 
