@@ -61,7 +61,7 @@ def select_player(selected, board, player, display):
     if selected == "human":
         return HumanPlayer(board, player, display)
     elif selected == "minimax":
-        return MinimaxPlayer(board, player, depth=6)
+        return MinimaxPlayer(board, player, depth=7)
     elif selected == "random":
         return RandomPlayer(board, player)
 

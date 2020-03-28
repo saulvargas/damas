@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Tuple
 
 import numpy as np
@@ -61,9 +62,10 @@ class Board:
         return board
 
     @staticmethod
-    def _moves_to(pos_a: Tuple[int, int], value_a: int, length: int, margin: int) -> np.ndarray:
+    @lru_cache(maxsize=None)
+    def _moves_to(pos_a: Tuple[int, int], value_a: int, margin: int) -> np.ndarray:
         b = np.array(pos_a, dtype=np.int8)
-        a = length * np.sign(value_a)
+        a = np.sign(value_a)
 
         if np.abs(value_a) == 1:
             positions = FWD_MOVES * a + b
@@ -78,7 +80,7 @@ class Board:
     def _get_moves1_from(self, pos_a: Tuple[int, int]):
         value_a = self[pos_a]
 
-        poss_b = Board._moves_to(pos_a, value_a, length=1, margin=0)
+        poss_b = Board._moves_to(pos_a, value_a, margin=0)
         values_b = self[(poss_b[:, 0], poss_b[:, 1])]
         valid_b = values_b == 0
 
@@ -89,12 +91,12 @@ class Board:
     def _get_moves2_from(self, pos_a: Tuple[int, int]):
         value_a = self[pos_a]
 
-        poss_c = Board._moves_to(pos_a, value_a, length=1, margin=1)
+        poss_c = Board._moves_to(pos_a, value_a, margin=1)
         values_c = self[(poss_c[:, 0], poss_c[:, 1])]
         valid_c = (value_a * values_c) < 0
 
         if np.any(valid_c):
-            poss_b = 2 * poss_c[valid_c] - np.array(pos_a)
+            poss_b = 2 * poss_c[valid_c] - np.array(pos_a, dtype=np.int8)
             values_b = self[(poss_b[:, 0], poss_b[:, 1])]
             valid_b = values_b == 0
             moves2 = [(pos_a, tuple(xy.tolist())) for xy in poss_b[valid_b]]
@@ -134,7 +136,7 @@ class Board:
             self.previous_values.clear()
             self.last_captured[self.turn_for] = -1
 
-            pos_c = tuple((np.array(pos_a) + np.array(pos_b)) // 2)
+            pos_c = tuple((np.array(pos_a, dtype=np.int8) + np.array(pos_b, dtype=np.int8)) // 2)
             self[pos_c] = 0
             more_moves = self._get_moves2_from(pos_b)
 
