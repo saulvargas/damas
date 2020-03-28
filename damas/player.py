@@ -32,6 +32,8 @@ class RandomPlayer(Player):
 
 class MinimaxPlayer(Player):
     DRAW_SCORE = -500
+    LOSE_SCORE = -1000
+    WIN_SCORE = 1000
 
     def __init__(self, board: Board, player: int, depth: int, seed=None, conservative=False, compact=True):
         super().__init__(board, player)
@@ -41,6 +43,13 @@ class MinimaxPlayer(Player):
         self._compact = compact
 
     def _score(self, board: Board):
+        lose = not np.any((board.values * self._player) > 0)
+        if lose:
+            return self.LOSE_SCORE
+        win = not np.any((board.values * self._player) < 0)
+        if win:
+            return self.WIN_SCORE
+
         # TODO: replace really bad heuristic!
         balance = np.sum(board.values) * self._player
         total_pieces = np.sum(np.abs(board.values))
@@ -54,9 +63,9 @@ class MinimaxPlayer(Player):
             return self._score(board), None
 
         if board.turn_for == self._player:
-            best_score, best_move = -1000, None
+            best_score, best_move = -1000000, None
         else:
-            best_score, best_move = +1000, None
+            best_score, best_move = +1000000, None
 
         self._rs.shuffle(moves)
         for move in moves:
