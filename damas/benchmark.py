@@ -1,9 +1,9 @@
 from time import time
 
-from damas.player import MinimaxPlayer
 from damas.board import Board
-from damas.game import Game
 from damas.display import NoDisplay
+from damas.loop import loop
+from damas.player import MinimaxPlayer
 
 
 def main():
@@ -15,10 +15,8 @@ def main():
         player_w = MinimaxPlayer(board, player=+1, depth=4, seed=i)
         player_b = MinimaxPlayer(board, player=-1, depth=4, seed=i)
 
-        game = Game(board, display, player_w, player_b)
-
         t0 = time()
-        wins, turns = game.loop()
+        wins, turns = loop(board, display, player_w, player_b)
         dt = time() - t0
 
         print(f"{i}\t{wins}\t{turns}\t{dt}")

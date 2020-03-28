@@ -4,7 +4,7 @@ from time import sleep
 from damas.board import Board
 from damas.board import NUM_ROWS, NUM_COLS
 from damas.display import Display
-from damas.game import Game
+from damas.loop import loop
 from damas.player import HumanPlayer, MinimaxPlayer
 
 
@@ -91,17 +91,14 @@ class CursesDisplay(Display):
 
 
 def main(_):
-    board = Board()
-
     display = CursesDisplay()
 
-    player1 = HumanPlayer(board, +1, display)
-    # player1 = RandomPlayer(board, +1, seed=1)
-    # player1 = MinimaxPlayer(board, +1, depth=4, seed=1)
-    player2 = MinimaxPlayer(board, -1, depth=4, seed=1)
+    board = Board()
 
-    game = Game(board, display, player1, player2)
-    game.loop()
+    player1 = HumanPlayer(board, +1, display)
+    player2 = MinimaxPlayer(board, -1, depth=7)
+
+    loop(board, display, player1, player2)
 
 
 if __name__ == '__main__':

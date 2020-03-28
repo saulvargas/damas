@@ -10,7 +10,7 @@ from websockets import WebSocketServerProtocol
 
 from damas.board import Board
 from damas.display import Display
-from damas.game import Game
+from damas.loop import async_loop
 from damas.player import MinimaxPlayer, HumanPlayer, RandomPlayer
 
 
@@ -78,9 +78,7 @@ async def echo(websocket: WebSocketServerProtocol, _):
     player1 = select_player(config["player_w"], board, +1, display)
     player2 = select_player(config["player_b"], board, -1, display)
 
-    game = Game(board, display, player1, player2)
-
-    await game.async_loop()
+    await async_loop(board, display, player1, player2)
 
     print("Game over")
 
