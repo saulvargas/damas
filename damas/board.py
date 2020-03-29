@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 
@@ -41,7 +41,7 @@ class Board:
         self.last_crowned = {+1: 0, -1: 0}
         self.last_captured = {+1: 0, -1: 0}
 
-    def __getitem__(self, pos: Tuple[int, int]) -> int:
+    def __getitem__(self, pos: Tuple[Union[int, np.ndarray], Union[int, np.ndarray]]) -> Union[np.ndarray, int]:
         return self.values[pos]
 
     def __setitem__(self, pos: Tuple[int, int], value: int):

@@ -42,13 +42,13 @@ class MinimaxPlayer(Player):
         self._conservative = conservative
         self._compact = compact
 
-    def _score(self, board: Board):
-        lose = not np.any((board.values * self._player) > 0)
-        if lose:
-            return self.LOSE_SCORE
-        win = not np.any((board.values * self._player) < 0)
-        if win:
-            return self.WIN_SCORE
+    def _score(self, board: Board, moves):
+        if not moves:
+            winner = -board.turn_for
+            if self._player == winner:
+                return self.WIN_SCORE
+            else:
+                return self.LOSE_SCORE
 
         # TODO: replace really bad heuristic!
         balance = np.sum(board.values) * self._player
@@ -60,7 +60,7 @@ class MinimaxPlayer(Player):
 
     def _minimax(self, board: Board, moves, depth: int, alpha, beta):
         if (depth == 0) or (not moves):
-            return self._score(board), None
+            return self._score(board, moves), None
 
         if board.turn_for == self._player:
             best_score, best_move = -1000000, None
